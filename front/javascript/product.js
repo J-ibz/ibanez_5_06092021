@@ -26,3 +26,57 @@ const afficherLeProduit = async function () {
     });
 };
 afficherLeProduit();
+
+//Selection du bouton ajouter au panier
+let cartButton = document.getElementById("addToCart");
+
+//Ajouter produit au panier lors du clique
+cartButton.addEventListener("click", function () {
+    // Select des elements à mettre dans le panier
+    let image = document.querySelector("body > main > div > section > article > div.item__img > img").src;
+    let imageAlt = document.querySelector("body > main > div > section > article > div.item__img > img").alt;
+    let name = document.getElementById("title").textContent;
+    let price = document.getElementById("price").textContent + "€";
+    let choixOpt = document.querySelector("#colors").value;
+    let productID = idProduct;
+    //transformation du type of qty
+    let qty_chiffre = document.querySelector("#quantity").value;
+    let qty = Number(qty_chiffre);
+
+    //pour tester la boucle et l'arreter
+    let boucle = 0;
+
+    // ajout des elt du panier dans un tableau
+    let eltPanier = [{ image, imageAlt, name, price, choixOpt, qty, productID }];
+
+    //Traduction du Json en Javascript
+    let panierToStock = JSON.parse(localStorage.getItem("produit"));
+
+    //Si le localstorage est vide, on créer tableau, on push le panier dedans et on stock dans localStorage
+    if (!panierToStock) {
+        panierToStock = [];
+        panierToStock.push(eltPanier);
+        localStorage.setItem("produit", JSON.stringify(panierToStock));
+    }
+    //Avant de stock dans local storage, on verifie si nom et option sont =, si = alors on incremente qty
+    else {
+        for (let i = 0; i < panierToStock.length; i++) {
+            if (panierToStock[i][0].name === name && panierToStock[i][0].choixOpt === choixOpt) {
+                panierToStock[i][0].qty += qty;
+                boucle = 1;
+            }
+        }
+        //Si pas égale, on stop la boucle et on push le panier dans local storage
+        if (boucle == 0) {
+            panierToStock.push(eltPanier);
+        }
+
+        localStorage.setItem("produit", JSON.stringify(panierToStock));
+    }
+
+    if (qty > 1) {
+        alert(`Vous avez ajouté ${qty} articles au panier`);
+    } else if (qty == 1) {
+        alert(`Vous avez ajouté ${qty} article au panier`);
+    }
+});
