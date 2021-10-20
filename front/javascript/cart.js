@@ -45,3 +45,46 @@ function supprimerArticle(e) {
     localStorage.setItem("produit", JSON.stringify(panier));
     location.reload();
 }
+
+// Mise à jour des quantités et total prix si modification des valeures dans l'input
+function getNewQty(e) {
+    let index = e.getAttribute("index");
+    let newQty = e.value;
+    panier[index][0].qty = newQty;
+
+    if (newQty == 0) {
+        panier.splice(index, 1);
+        localStorage.setItem("produit", JSON.stringify(panier));
+        location.reload();
+    } else {
+        document.querySelector("#totalQuantity").innerHTML = totalQty();
+        document.querySelector("#totalPrice").innerHTML = totalPrice();
+        localStorage.setItem("produit", JSON.stringify(panier));
+    }
+}
+// Calcul du total prix
+function totalPrice() {
+    let totalprix = 0;
+    for (let i = 0; i < panier.length; i++) {
+        let quantity = parseInt(panier[i][0].qty);
+        let prix = parseInt(panier[i][0].price);
+        totalprix += prix * quantity;
+    }
+    return totalprix;
+}
+
+// affichage du total prix
+document.querySelector("#totalPrice").innerHTML = totalPrice();
+
+// Calcul du total quantité(s)
+function totalQty() {
+    let totalqty = 0;
+    for (let i = 0; i < panier.length; i++) {
+        let quantity = parseInt(panier[i][0].qty);
+        totalqty += quantity;
+    }
+    return totalqty;
+}
+
+// affichage du total quantités
+document.querySelector("#totalQuantity").innerHTML = totalQty();
