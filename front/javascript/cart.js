@@ -37,3 +37,11 @@ function afficherPanier() {
     }
 }
 afficherPanier();
+
+// Supression de la ligne  au clic du bouton suppr
+function supprimerArticle(e) {
+    let index = e.getAttribute("index");
+    panier.splice(index, 1);
+    localStorage.setItem("produit", JSON.stringify(panier));
+    location.reload();
+}
