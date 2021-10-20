@@ -88,3 +88,148 @@ function totalQty() {
 
 // affichage du total quantités
 document.querySelector("#totalQuantity").innerHTML = totalQty();
+
+// Selection de la div contenant tout le formulaire
+let formulaire = document.querySelector(".cart__order__form");
+
+//Selection des éléments du formulaire
+let firstName = formulaire.firstName;
+let lastName = formulaire.lastName;
+let address = formulaire.address;
+let city = formulaire.city;
+let email = formulaire.email;
+let boutonCommander = formulaire.submit;
+
+//Declaration des RegExp
+let emailRegExp = /^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$/;
+let nameRegExp = /^[a-zA-Zéêëèîïâäçù ,'-]{3,20}$/;
+let addressRegExp = /^[0-9]{1,3}[a-zA-Zéêëèîïâäçù ,'-]+$/;
+
+//Verif Prenom
+firstName.addEventListener("input", function () {
+    verificationFirstName(firstName);
+});
+
+function verificationFirstName() {
+    let testFirstName = nameRegExp.test(firstName.value);
+    if (testFirstName == false) {
+        firstName.nextElementSibling.innerHTML = `Ne peut contenir de chiffres ou caractères spéciaux`;
+        return false;
+    } else {
+        firstName.nextElementSibling.innerHTML = "";
+        return true;
+    }
+}
+
+//Verif Nom de famille
+lastName.addEventListener("input", function () {
+    verificationLastName(lastName);
+});
+
+function verificationLastName() {
+    let testlastName = nameRegExp.test(lastName.value);
+    if (testlastName == false) {
+        lastName.nextElementSibling.innerHTML = `Ne peut contenir de chiffres ou caractères spéciaux`;
+        return false;
+    } else {
+        lastName.nextElementSibling.innerHTML = "";
+        return true;
+    }
+}
+
+//Verif Ville
+city.addEventListener("input", function () {
+    verificationCity(city);
+});
+
+function verificationCity() {
+    let testCity = nameRegExp.test(city.value);
+    if (testCity == false) {
+        city.nextElementSibling.innerHTML = `Veuillez saisir une nom de ville valide <br> Ne doit pas contenir de chiffre`;
+        return false;
+    } else {
+        city.nextElementSibling.innerHTML = "";
+        return true;
+    }
+}
+
+//Verif adresse
+address.addEventListener("change", function () {
+    verificationAddress(address);
+});
+
+function verificationAddress() {
+    let testAddress = addressRegExp.test(address.value);
+    if (testAddress == false) {
+        address.nextElementSibling.innerHTML = `Veuillez saisir une adresse valide <br> Exemple: <i>10 rue de Paris</i>`;
+        return false;
+    } else {
+        address.nextElementSibling.innerHTML = "";
+        return true;
+    }
+}
+
+//Verif Email
+email.addEventListener("change", function () {
+    verificationEmail(email);
+});
+
+function verificationEmail() {
+    let testEmail = emailRegExp.test(email.value);
+    if (testEmail == false && email.value != "") {
+        email.nextElementSibling.innerHTML = "Veuillez saisir une adresse email valide";
+        return false;
+    } else {
+        email.nextElementSibling.innerHTML = "";
+        return true;
+    }
+}
+
+// Envoie du formulaire au clique du bouton commander
+boutonCommander.addEventListener("click", function (event) {
+    event.preventDefault();
+    //Si tous les éléments du formulaire sont  OK
+    if (verificationFirstName(firstName) && verificationLastName(lastName) && verificationCity(city) && verificationAddress(address) && verificationEmail(email)) {
+        //Recup ID des produits du panier (seul élément a devoir être envoyé vers serveur)
+        function recupIdProduct() {
+            let idProduct = [];
+            for (let i = 0; i < panier.length; i++) {
+                id = panier[i][0].productID;
+                idProduct.push(id);
+            }
+            return idProduct;
+        }
+        //déclaration d'une variable contenant les ID
+        let productID = recupIdProduct();
+
+        //création de l'objet commande (contenant les infos du client + id des produits commandé)
+        let commande = {
+            contact: {
+                firstName: firstName.value,
+                lastName: lastName.value,
+                address: address.value,
+                city: city.value,
+                email: email.value,
+            },
+            products: productID,
+        };
+
+        // Création de l'entête de la requête
+        let options = {
+            method: "POST",
+            body: JSON.stringify(commande),
+            headers: { "Content-Type": "application/json" },
+        };
+        fetch("http://localhost:3000/api/products/order", options)
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                localStorage.clear();
+                let orderId = data.orderId;
+                // localStorage.setItem("idCommande", JSON.stringify(orderId));
+                // document.location.href = `confirmation.html`;
+                window.location.assign(`confirmation.html?orderId=${orderId}`);
+            });
+    }
+});
