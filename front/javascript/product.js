@@ -53,7 +53,7 @@ cartButton.addEventListener("click", function (e) {
         // ajout des elt du panier dans un tableau
         let eltPanier = [{ image, imageAlt, name, price, choixOpt, qty, productID }];
 
-        //Traduction du Json en Javascript
+        //Déclaration au format js de la clé produit stocké dans le local storage
         let panierToStock = JSON.parse(localStorage.getItem("produit"));
 
         //Si le localstorage est vide, on créer tableau, on push le panier dedans et on stock dans localStorage
